@@ -42,10 +42,8 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) throw new Error('Invalid password');
 
-        const generateToken = this.jwtService.sign(user);
-
         return {
-            Bearer: generateToken,
+            Bearer: this.jwtService.sign(user),
         }
 
     }
