@@ -14,4 +14,8 @@ export class AuthController {
   loginUser() {
     return this.userService.listUsers();
   }
+  @MessagePattern({ cmd: 'register' })
+  register() {
+    return this.authService.register();
+  }
 }
