@@ -46,6 +46,5 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         return {
             Bearer: this.jwtService.sign(user),
         }
-
     }
 }
