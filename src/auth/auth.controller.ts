@@ -10,9 +10,9 @@ export class AuthController {
     private readonly userService: UserService
   ) {}
 
-  @MessagePattern({ cmd: 'login_user' })
-  loginUser() {
-    return this.userService.listUsers();
+  @MessagePattern({ cmd: 'login' })
+  login(@Payload() payload: any) {
+    return this.authService.login(payload);
   }
   @MessagePattern({ cmd: 'register' })
   register(@Payload() payload: any) {
