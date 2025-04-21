@@ -47,4 +47,13 @@ export class AuthService extends PrismaClient implements OnModuleInit {
             Bearer: this.jwtService.sign(user),
         }
     }
+
+    async verifyToken(token: string) {
+        const decode = this.jwtService.verify(token);
+        return {
+            valid: true,
+            decode: decode,
+        }
+    }
+
 }

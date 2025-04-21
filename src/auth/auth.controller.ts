@@ -18,4 +18,10 @@ export class AuthController {
   register(@Payload() payload: any) {
     return this.authService.register(payload);
   }
+
+  @MessagePattern({ cmd: 'verify.token' })
+  verifyToken(@Payload() token: string) {
+    return this.authService.verifyToken(token);
+  }
+
 }
