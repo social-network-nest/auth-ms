@@ -16,13 +16,12 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     async register(payload: any) {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(payload.password, saltRounds);
-        const user = await this.auth.create({
+        return await this.auth.create({
             data: {
                 email: payload.email,
                 password: hashedPassword,
             },
         });
-        return user;
     }
 
     async findUserByEmail(email: string) {
