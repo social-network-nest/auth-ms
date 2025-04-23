@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -41,26 +41,41 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         });
     }
 
-    async findUserByEmail(email: string) {
-        const auth = await this.auth.findUnique({
-            where: {
-                email: email,
-            },
+    async findAuthByEmail(email: string) {
+        return await this.auth.findUnique({
+            where: { email },
         });
-        return auth;
+    }
+
+    async findUserByAuthId(authId: string) {
+        return await this.user.findUnique({
+            where: { authId },
+        });
     }
 
     async login(payload: any) {
         const {email, password} = payload;
 
-        const user = await this.findUserByEmail(email);
-        if (!user) throw new Error('User not found');
+        const auth = await this.findAuthByEmail(email);
+        if (!auth) {
+            throw new NotFoundException('User with this email does not exist');
+        }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) throw new Error('Invalid password');
+        const isPasswordValid = await bcrypt.compare(password, auth.password);
+        if (!isPasswordValid) {
+            throw new UnauthorizedException('Incorrect password');
+        }
+
+        const user = await this.findUserByAuthId(auth.id);
+        if (!user) {
+            throw new NotFoundException('User profile not found');
+        }
 
         return {
-            Bearer: this.jwtService.sign(user),
+            Bearer: this.jwtService.sign({
+                email: auth.email,
+                user_id: user.id,
+            }),
         }
     }
 
@@ -72,4 +87,23 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         }
     }
 
+    async findUserByEmail(email: any) {
+        const auth = await this.findAuthByEmail(email);
+        if (!auth) {
+            throw new NotFoundException('User with this email does not exist');
+        }
+        const user = await this.findUserByAuthId(auth.id);
+        if (!user) {
+            throw new NotFoundException('User profile not found');
+        }
+        return user;
+    }
+
+    async listUsers() {
+        const user = await this.user.findMany()
+        if (!user) {
+            throw new NotFoundException('No users found');
+        }
+        return user;
+    }
 }
