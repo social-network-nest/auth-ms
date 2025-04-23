@@ -5,7 +5,9 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService extends PrismaClient implements OnModuleInit {
-    constructor(private jwtService: JwtService) {
+    constructor(
+        private jwtService: JwtService,
+    ) {
         super();
     }
 
@@ -14,24 +16,38 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     }
 
     async register(payload: any) {
-        const {email, password} = payload;
+        const {
+            email,
+            password,
+            firstname,
+            lastname
+        } = payload;
         const saltRounds = 10;
 
         const hashedPassword = await bcrypt.hash(password, saltRounds);
-        return await this.auth.create({
+        const auth = await this.auth.create({
             data: {
                 email: email,
                 password: hashedPassword,
             },
         });
+
+        return await this.user.create({
+            data: {
+                firstName: firstname,
+                lastName: lastname,
+                authId: auth.id,
+            },
+        });
     }
 
     async findUserByEmail(email: string) {
-        return await this.auth.findUnique({
+        const auth = await this.auth.findUnique({
             where: {
                 email: email,
             },
         });
+        return auth;
     }
 
     async login(payload: any) {
