@@ -16,12 +16,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     }
 
     async register(payload: any) {
-        const {
-            email,
-            password,
-            firstname,
-            lastname
-        } = payload;
+        const {email, password, firstname, lastname} = payload;
         const saltRounds = 10;
 
         const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -74,7 +69,7 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         return {
             Bearer: this.jwtService.sign({
                 email: auth.email,
-                user_id: user.id,
+                userId: user.id,
             }),
         }
     }
@@ -92,10 +87,12 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         if (!auth) {
             throw new NotFoundException('User with this email does not exist');
         }
+
         const user = await this.findUserByAuthId(auth.id);
         if (!user) {
             throw new NotFoundException('User profile not found');
         }
+
         return user;
     }
 
