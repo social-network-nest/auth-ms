@@ -96,7 +96,13 @@ export class AuthService extends PrismaClient implements OnModuleInit {
     }
 
     async listUsers() {
-        const user = await this.user.findMany()
+        const user = await this.user.findMany({
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
         if (!user) {
             throw new NotFoundException('No users found');
         }
