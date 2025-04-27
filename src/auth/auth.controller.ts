@@ -22,9 +22,9 @@ export class AuthController {
     return this.authService.verifyToken(token);
   }
 
-  @MessagePattern({ cmd: 'find.user.email' })
-  findUserById(@Payload() email: string) {
-    return this.authService.findUserByEmail(email);
+  @MessagePattern({ cmd: 'find.user.id' })
+  findUserById(@Payload() id: string) {
+    return this.authService.findUserById(id);
   }
 
   @MessagePattern({ cmd: 'list.users' })

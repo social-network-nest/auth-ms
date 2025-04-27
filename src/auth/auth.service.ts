@@ -82,18 +82,17 @@ export class AuthService extends PrismaClient implements OnModuleInit {
         }
     }
 
-    async findUserByEmail(email: any) {
-        const auth = await this.findAuthByEmail(email);
-        if (!auth) {
-            throw new NotFoundException('User with this email does not exist');
-        }
-
-        const user = await this.findUserByAuthId(auth.id);
-        if (!user) {
-            throw new NotFoundException('User profile not found');
-        }
-
-        return user;
+    async findUserById(id: any) {
+        return await this.user.findUnique({
+            where: {
+                id: id,
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+            }
+        })
     }
 
     async listUsers() {
